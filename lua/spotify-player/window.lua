@@ -4,7 +4,6 @@ local fn = vim.fn
 local M = {}
 
 local spotify_win = nil -- Store the window handle
-local spotify_buf = nil -- Store the buffer handle
 
 local function create_spotify_player_window()
   if fn.executable("spotify_player") ~= 1 then
@@ -23,7 +22,7 @@ local function create_spotify_player_window()
       api.nvim_win_show(spotify_win)
     end
   else
-    spotify_buf = api.nvim_create_buf(false, true)
+    local buf = api.nvim_create_buf(false, true)
     local width = vim.o.columns
     local height = vim.o.lines
 
@@ -43,14 +42,14 @@ local function create_spotify_player_window()
       border = "rounded",
     }
 
-    spotify_win = api.nvim_open_win(spotify_buf, true, opts)
+    spotify_win = api.nvim_open_win(buf, true, opts)
 
     api.nvim_set_option_value("winblend", 0, { win = spotify_win })
 
-    vim.bo[spotify_buf].bufhidden = "wipe"
+    vim.bo[buf].bufhidden = "wipe"
 
     api.nvim_create_autocmd("TermClose", {
-      buffer = spotify_buf,
+      buffer = buf,
       callback = function()
         vim.schedule(function()
           api.nvim_win_close(0, true)
@@ -62,7 +61,7 @@ local function create_spotify_player_window()
     fn.termopen("spotify_player")
 
     -- Intercept the `q` key press to toggle window visibility
-    api.nvim_buf_set_keymap(spotify_buf, "t", "q", "<Cmd>ToggleSpotifyPlayer<CR>", { noremap = true, silent = true })
+    api.nvim_buf_set_keymap(buf, "t", "q", "<Cmd>ToggleSpotifyPlayer<CR>", { noremap = true, silent = true })
 
     vim.cmd("startinsert")
   end
