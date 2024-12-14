@@ -61,7 +61,8 @@ local function create_spotify_player_window()
     fn.termopen("spotify_player")
 
     -- Intercept the `q` key press to toggle window visibility
-    api.nvim_buf_set_keymap(buf, "t", "q", "<Cmd>ToggleSpotifyPlayer<CR>", { noremap = true, silent = true })
+
+    api.nvim_buf_set_keymap(buf, "t", "q", "<Cmd>ToggleSpotifyPlayer<lt>CR>", { noremap = true, silent = true })
 
     vim.cmd("startinsert")
   end
