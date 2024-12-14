@@ -3,51 +3,66 @@ local fn = vim.fn
 
 local M = {}
 
+local spotify_win = nil -- Store the window handle
+local spotify_buf = nil -- Store the buffer handle
+
 local function create_spotify_player_window()
   if fn.executable("spotify_player") ~= 1 then
     api.nvim_err_writeln("Failed to start spotify-player. Is it installed and in your PATH?")
     return
   end
 
-  local buf = api.nvim_create_buf(false, true)
-  local width = vim.o.columns
-  local height = vim.o.lines
+  -- Check if window already exists
+  if spotify_win then
+    local win_visible = api.nvim_win_is_valid(spotify_win)
+    if win_visible then
+      -- If the window is visible, hide it
+      api.nvim_win_hide(spotify_win)
+    else
+      -- If the window is hidden, show it again
+      api.nvim_win_show(spotify_win)
+    end
+  else
+    local buf = api.nvim_create_buf(false, true)
+    local width = vim.o.columns
+    local height = vim.o.lines
 
-  local win_height = math.ceil(height * 0.9)
-  local win_width = math.ceil(width * 0.9)
+    local win_height = math.ceil(height * 0.9)
+    local win_width = math.ceil(width * 0.9)
 
-  local row = math.ceil((height - win_height) / 2 - 1)
-  local col = math.ceil((width - win_width) / 2)
+    local row = math.ceil((height - win_height) / 2 - 1)
+    local col = math.ceil((width - win_width) / 2)
 
-  local opts = {
-    style = "minimal",
-    relative = "editor",
-    width = win_width,
-    height = win_height,
-    row = row,
-    col = col,
-    border = "rounded",
-  }
+    local opts = {
+      style = "minimal",
+      relative = "editor",
+      width = win_width,
+      height = win_height,
+      row = row,
+      col = col,
+      border = "rounded",
+    }
 
-  local win = api.nvim_open_win(buf, true, opts)
+    local win = api.nvim_open_win(buf, true, opts)
 
-  api.nvim_set_option_value("winblend", 0, { win = win })
+    api.nvim_set_option_value("winblend", 0, { win = win })
 
-  vim.bo[buf].bufhidden = "wipe"
+    vim.bo[buf].bufhidden = "wipe"
 
-  api.nvim_create_autocmd("TermClose", {
-    buffer = buf,
-    callback = function()
-      vim.schedule(function()
-        api.nvim_win_close(0, true)
-      end)
-    end,
-    once = true,
-  })
+    api.nvim_create_autocmd("TermClose", {
+      buffer = buf,
+      callback = function()
+        vim.schedule(function()
+          api.nvim_win_close(0, true)
+        end)
+      end,
+      once = true,
+    })
 
-  fn.termopen("spotify_player")
+    fn.termopen("spotify_player")
 
-  vim.cmd("startinsert")
+    vim.cmd("startinsert")
+  end
 end
 
 function M.setup(opts)
