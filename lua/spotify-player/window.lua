@@ -45,7 +45,7 @@ local function create_spotify_player_window()
     once = true,
   })
 
-  fn.termopen("spotify-player")
+  fn.termopen("spotify_player")
 
   vim.cmd("startinsert")
 end
