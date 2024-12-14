@@ -3,9 +3,9 @@ local fn = vim.fn
 
 local M = {}
 
-local function create_spotify_window()
+local function create_spotify_player_window()
   if fn.executable("spotify-player") ~= 1 then
-    api.nvim_err_writeln("Failed to start spotify player Is it installed and in your PATH?")
+    api.nvim_err_writeln("Failed to start spotify-player. Is it installed and in your PATH?")
     return
   end
 
@@ -51,7 +51,7 @@ local function create_spotify_window()
 end
 
 function M.setup(opts)
-  vim.api.nvim_create_user_command("SpotifyPlayer", create_spotify_window(), {})
+  vim.api.nvim_create_user_command("SpotifyPlayer", create_spotify_player_window, {})
 end
 
 return M
